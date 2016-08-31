@@ -97,9 +97,9 @@ End If
 ' TIC toggle
 'enableTIC = Not disableTIC
 'For i = Analysis.Chromatograms.Count to 1 step -1 
-'	If Analysis.Chromatograms(i).Definition.Type = daTICChromType Then 
-'		Analysis.Chromatograms(i).Enable enableTIC 
-'	End If 
+'    If Analysis.Chromatograms(i).Definition.Type = daTICChromType Then 
+'        Analysis.Chromatograms(i).Enable enableTIC 
+'    End If 
 'Next 
 
 If autoeic Then 
@@ -120,8 +120,8 @@ If autoeic Then
      
     If filelist.Count = 0 Then 
         MsgBox "No Excel file was found!", _
-    	    vbOKOnly+vbCritical+vbSystemModal, _
-    	    "DataAnalysis script" 
+            vbOKOnly+vbCritical+vbSystemModal, _
+            "DataAnalysis script" 
         Form.Close 
     Else 
         ' Pick the first Excel file
@@ -143,8 +143,8 @@ If autoeic Then
      
     If Not SheetExists Then  
         MsgBox "The specified Excel worksheet was not found!", _
-    	    vbOKOnly+vbCritical+vbSystemModal, _
-    		"DataAnalysis script" 
+            vbOKOnly+vbCritical+vbSystemModal, _
+            "DataAnalysis script" 
         wb.Close False 
         xl.Quit 
         Form.Close 

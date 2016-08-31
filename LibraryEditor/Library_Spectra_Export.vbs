@@ -22,7 +22,7 @@ Dim objFSO, objFolder, objArchive, objFile ' FSO objects
 Dim filelist                               ' Array
 Dim libraryname, filepath, cd              ' Strings
 Dim count, first, skip, i                  ' Integers
-Dim delayS, delayM, delayL				   ' Integers
+Dim delayS, delayM, delayL                 ' Integers
 
 
 '##############################'
@@ -50,22 +50,22 @@ Set objFSO = CreateObject("Scripting.FileSystemObject")
 cd = objFSO.GetParentFolderName(WScript.ScriptFullName)
 If Not objFSO.FolderExists(cd + "\" + libraryname) Then
     MsgBox "Library was not found!", _
-      vbOKOnly+vbCritical+vbSystemModal, _
-      "Library Spectra Export"
-	Wscript.Quit
+        vbOKOnly+vbCritical+vbSystemModal, _
+        "Library Spectra Export"
+    Wscript.Quit
 Else
     Set objFolder = objFSO.GetFolder(cd + "\" + libraryname)
     ' just for testing
-    REM If Not objFSO.FolderExists(objFolder + "_Xpec") Then
-        REM Set objArchive = objFSO.CreateFolder(objFolder + "_Xpec")
-    REM Else
-        REM Set objArchive = objFSO.GetFolder(objFolder + "_Xpec")
-    REM End If
+    'If Not objFSO.FolderExists(objFolder + "_Xpec") Then
+    '    Set objArchive = objFSO.CreateFolder(objFolder + "_Xpec")
+    'Else
+    '    Set objArchive = objFSO.GetFolder(objFolder + "_Xpec")
+    'End If
     ' create folder for extracted spectra (Xpec)
     If objFSO.FolderExists(objFolder + "_Xpec") Then
         MsgBox "Spectra archive (Xpec) already exists! Will abort now!", _
-          vbOKOnly+vbCritical+vbSystemModal, _
-          "Library Spectra Export"
+            vbOKOnly+vbCritical+vbSystemModal, _
+            "Library Spectra Export"
         Wscript.Quit
     Else
         Set objArchive = objFSO.CreateFolder(objFolder + "_Xpec")
@@ -75,24 +75,24 @@ End If
 ' Find the .mlb file in the Library
 Set filelist = CreateObject("System.Collections.ArrayList")
 For Each objFile In objFolder.Files
-	' Only proceed if there is an extension on the file.
-	If (InStr(objFile.Name, ".") > 0) Then
-		' If the file's extension is "mlb", echo the path to it.
-		If (LCase(Mid(objFile.Name, InStrRev(objFile.Name, "."))) = ".mlb") Then
-			'Wscript.Echo objFile.Path
-			filelist.Add objFile.Path
-		End If
-	End If
+    ' Only proceed if there is an extension on the file.
+    If (InStr(objFile.Name, ".") > 0) Then
+        ' If the file's extension is "mlb", echo the path to it.
+        If (LCase(Mid(objFile.Name, InStrRev(objFile.Name, "."))) = ".mlb") Then
+            'Wscript.Echo objFile.Path
+            filelist.Add objFile.Path
+        End If
+    End If
 Next
 
 If filelist.Count = 0 Then
-	MsgBox "No .mlb file was found in the library!", _
-      vbOKOnly+vbCritical+vbSystemModal, _
-      "Library Spectra Export"
-	Wscript.Quit
+    MsgBox "No .mlb file was found in the library!", _
+        vbOKOnly+vbCritical+vbSystemModal, _
+        "Library Spectra Export"
+    Wscript.Quit
 Else
     'MsgBox CStr(filelist.Count) + ": " + filelist.Item(0)
-	filepath = filelist.Item(0)
+    filepath = filelist.Item(0)
 End If
 
 ' Check if LibraryEditor is already running and warn user if true
@@ -104,9 +104,9 @@ strObject   = "winmgmts://" & strComputer
 For Each Process in GetObject( strObject ).InstancesOf( "win32_process" )
 If UCase( Process.name ) = UCase( strProcess ) Then
         MsgBox "LibraryEditor is already running! It might be safer to check it" _
-		+", save your work and close the application before using this script. Will abort now...", _
-		vbOKOnly+vbCritical+vbSystemModal, "Library Spectra Export"
-		Wscript.Quit
+            +", save your work and close the application before using this script. Will abort now...", _
+            vbOKOnly+vbCritical+vbSystemModal, "Library Spectra Export"
+        Wscript.Quit
     End If
 Next
 

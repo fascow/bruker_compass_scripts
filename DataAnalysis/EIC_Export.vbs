@@ -20,13 +20,13 @@ Option Explicit
 Dim xl, Shell                           ' app opjects
 Dim wb, ws                              ' Excel objects
 Dim row, lastvalue, newvalue, delay     ' integers
-Dim result								' MsgBox result
+Dim result                              ' MsgBox result
 
 result = MsgBox ("Starting to extract EICs...", _
     vbOKCancel+vbInformation+vbSystemModal, _
     "DataAnalysis EIC Export")
 If result = vbCancel Then
-	Wscript.Quit
+    Wscript.Quit
 End If
 
 ' Start Excel, open a new workbook
@@ -66,16 +66,16 @@ Do While True
     newvalue = ws.Cells(row, 1).Value
     'MsgBox "Last: " + CStr(lastvalue) + "New: " + CStr(newvalue)
     If lastvalue = newvalue Then
-    	ws.Cells(row, 1).Value = ""
-    	'WScript.Sleep 100
-    	Shell.AppActivate("Compass DataAnalysis")
-    	WScript.Sleep 100
-    	' on last, to close Chromatogram-window
-    	Shell.SendKeys "{ESC}"
-    	Exit Do
+        ws.Cells(row, 1).Value = ""
+        'WScript.Sleep 100
+        Shell.AppActivate("Compass DataAnalysis")
+        WScript.Sleep 100
+        ' on last, to close Chromatogram-window
+        Shell.SendKeys "{ESC}"
+        Exit Do
     Else 
-    	lastvalue = newvalue
-    	row = row + 1
+        lastvalue = newvalue
+        row = row + 1
     End If
     
     Shell.AppActivate("Compass DataAnalysis")
