@@ -16,15 +16,13 @@ Dim cd                         ' strings
 Dim objFSO, objFolder, objFile ' file system objects
 Dim Shell                      ' app opjects
 Dim result                     ' MsgBox result
-Dim delayS', delayM, delayL     ' integers: delays
+Dim delay                      ' integers
 
 '##############################'
 '######### SET VALUES #########'
 
 ' how slow is you computer? specify delays in milliseconds
-delayS = 50 '20
-'delayM = 100 '50
-'delayL = 500
+delay = 50
 
 '##############################'
 '##############################'
@@ -82,12 +80,12 @@ End If
 
 ' go to work table
 Shell.SendKeys "+{TAB 5}"
-WScript.Sleep delayS
+WScript.Sleep delay
 ' go to cell A1
 Shell.SendKeys "{DOWN}"
-WScript.Sleep delayS
+WScript.Sleep delay
 Shell.SendKeys "{RIGHT}"
-WScript.Sleep delayS
+WScript.Sleep delay
 
 
 ' find all *.d directories in current directory
@@ -106,55 +104,55 @@ For Each objFile In objFolder.SubFolders
             
             ' enter filename
             Shell.SendKeys CStr(objFile.Name)
-            WScript.Sleep delayS
+            WScript.Sleep delay
             ' enter Inj.Vol.
             Shell.SendKeys "{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "1"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             ' enter Dil.Factor
             Shell.SendKeys "{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "1"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             ' enter Inj.No.
             Shell.SendKeys "{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "1"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             ' go to B1
             Shell.SendKeys "+{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "+{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "+{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "+{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "+{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "+{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "+{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "+{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "+{TAB}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             Shell.SendKeys "{DOWN}"
-            WScript.Sleep delayS
+            WScript.Sleep delay
             
             '''''''''''''''''''''''''''''''''''''
             
