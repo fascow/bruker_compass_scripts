@@ -35,7 +35,7 @@ Dim delayS, delayM, delayL                                    ' integers: delays
 '######### SET VALUES #########'
 
 ' where to find you table? There shall be only one excel file in the folder, where you run this script
-sheetname  = "Sheet1"
+sheetname  = "Sheet2"
 
 ' how to name the method file?
 methodfile = "QAmethod"
@@ -91,7 +91,7 @@ methodpath = cd + "\" + methodfile + ".m"
 
 If (objFSO.FolderExists(methodpath)) Then ' the Bruker methods are actually folders!
     MsgBox "The specified method file already exists!", _
-        vbOKOnly+vbCritical+vbSystemModal, 
+        vbOKOnly+vbCritical+vbSystemModal, _
         "QuantAnalysis method writer"
     Wscript.Quit
 End If
