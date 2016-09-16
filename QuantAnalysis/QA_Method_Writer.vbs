@@ -2,7 +2,7 @@ Option Explicit
 
 ' QuantAnalysis Method Writer
 '
-' Version 3
+' Version 4
 '
 ' Take a list of (Compound Names,) PIs and RTs from an Excel file to
 ' create a Bruker Compass QuantAnalysis Method file by GUI scripting
@@ -16,6 +16,13 @@ Option Explicit
 ' the method file will be saved in the same folder
 ' the MS data files have to be in the same folder as well
 ' it is advised to use copies and not you original files
+' it is advised to close all other programs before using this script
+
+' EIC mass window width parameter can be specified in the script
+' EIC smoothing parameters can be set globally in the script
+' or for each EIC indivually in the Excel file, but in the latter case
+' every row that has the same Precusor ion value (isomers) needs to have 
+' the same smoothing parameters as well, because only one EIC will be created
 
 ' IMPORTANT
 ' This script assumes that QuantAnalysis opens in Nested or Work Table view
@@ -24,8 +31,9 @@ Option Explicit
 
 ' TODO
 ' set retention time window to "1" if no value or no column (-1) specified
-' make more values accessible to the user of the script (e.g. EIC mass width, smoothing width)
+' make more values accessible to the user of the script (e.g. Peak detection smoothing width)
 ' if there are no data files, don't ask user to switch to nested or work table view
+' added polarity setting for MS, check if it works properly
 
 Dim sheetname, cd, filepath, methodfile ' strings
 Dim methodpath, compname
@@ -37,15 +45,18 @@ Dim result                              ' MsgBox result
 Dim row, initrow, count, pipos, i       ' integers
 Dim LastRow, LastCol
 Dim namecol, picol, rtcol, rtwcol       ' integers: column numbers
+Dim widthcol, cyclescol
 Dim pivalue, prevpi, rtvalue, rtwin     ' double
 Dim delayS, delayM, delayL              ' integers: delays
 Dim sorted, keepchanges, debug          ' booleans
+Dim mzwidth, width, cycles              ' double: EIC parameters
+Dim polarity
 
 '##############################'
 '######### SET VALUES #########'
 
 ' where to find you table? There shall be only one Excel file in the folder, where you run this script
-sheetname   = "Sheet3"
+sheetname   = "Sheet4"
 sorted      = False ' is your sheet already sorted for QuantAnalysis? set to False if you want this script to sort your data for QuantAnalyis
 keepchanges = False ' do you want to save a sorted copy of your sheet?
 
@@ -59,6 +70,24 @@ namecol = 1 ' set this to -1 if you have no compound names or
 picol   = 2
 rtcol   = 4
 rtwcol  = 5
+
+' MS polartiy setting (positive or negative)
+polarity = "negative"
+
+' EIC mass window, will result in mz +/- mzwidth
+mzwidth = 0.3 ' on our instrument 0.2 - 0.3 is a good choice
+
+' Smoothing Parameters
+' width is specified in seconds: 2.0 -  5.0
+' cycles shall be integer:       1   - 10
+' enter either the numbers of the columns, where the values are stored 
+' or set values directly in this script (all EICs will have the same values)
+' column numbers
+widthcol  = 6 ' set to -1 to use the value specified below for all EICs
+cyclescol = 7 ' set to -1 to use the value specified below for all EICs
+' parameters applied to all EICs, will be ignored if column numbers were specified above
+width  = 3 ' sec (Gauss algorithm)
+cycles = 3
 
 ' how slow is you computer? specify delays in milliseconds
 delayS = 50
@@ -370,17 +399,38 @@ Shell.SendKeys "{TAB}"
 Shell.SendKeys "{DOWN}"
 ' select mass error in +-Dalton
 Shell.SendKeys "{TAB 2}"
-Shell.SendKeys "{DOWN 2}" ' select +-0.3
-' set Polarity to "negative"
-Shell.SendKeys "{TAB}"
-Shell.SendKeys "{DOWN 2}"
+' EIC mass window (mzwidth)
+' QA wants "+n.n -m.m" or "±k.k", but the plusminus sign is not easy to transfer from VBS to QA
+Shell.SendKeys "{+}" & CStr(mzwidth) & " -" & CStr(mzwidth)
 
-' go back prior to entering the first PI mass
+' set MS Polarity
+Shell.SendKeys "{TAB}"
+If polarity = "positive" Then
+    Shell.SendKeys "{DOWN}"
+ElseIf polarity = "negative" Then
+    Shell.SendKeys "{DOWN 2}"
+End If
+
+' set Smoothing parameters for all EICs
+If widthcol < 1 Then
+    Shell.SendKeys "{TAB 2}"
+    Shell.SendKeys CStr(width)
+    Shell.SendKeys "+{TAB 2}"
+End If
+
+If cyclescol < 1 Then
+    Shell.SendKeys "{TAB 4}"
+    Shell.SendKeys CStr(cycles)
+    Shell.SendKeys "+{TAB 4}"
+End If
+
+' go back to "Masses" prior to entering the first PI mass
 Shell.SendKeys "+{TAB 2}"
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ' collect all unique PI values from the Excel file and write them into QA
+' if columns for Smoothing Parameters were specified, each EIC will have individual values for that
 Set pilist = CreateObject("System.Collections.ArrayList")
 prevpi = 0
 For row = initrow to lastrow
@@ -394,13 +444,48 @@ For row = initrow to lastrow
         ''   enter Masses
         ''   click "Add"
         
-        Shell.SendKeys ws.Cells(row,picol).Value
-        ' click "Add"
-        Shell.SendKeys "{TAB 5}"
-        Shell.SendKeys "{ENTER}"
-        ' go back to mass input
-        Shell.SendKeys "+{TAB 5}"
+        Shell.SendKeys ws.Cells(row, picol).Value ' was already converted to string before sorting in Excel
         
+        If ((widthcol > 0) And (cyclescol > 0)) Then
+            Shell.SendKeys "{TAB 4}"
+            ' Smoothing width goes here
+            Shell.SendKeys CStr(ws.Cells(row, widthcol).Value)
+            Shell.SendKeys "{TAB 2}"
+            ' Smoothing cycles go here
+            Shell.SendKeys CStr(ws.Cells(row, cyclescol).Value)
+            ' click "Add"
+            Shell.SendKeys "+{TAB}"
+            Shell.SendKeys "{ENTER}"
+            WScript.Sleep delayS ' crucial
+            ' go back to mass input
+            Shell.SendKeys "+{TAB 5}"
+        ElseIf ((widthcol > 0) And (cyclescol < 1)) Then
+            Shell.SendKeys "{TAB 4}"
+            ' Smoothing width goes here
+            Shell.SendKeys CStr(ws.Cells(row, widthcol).Value)
+            ' click "Add"
+            Shell.SendKeys "{TAB}"
+            Shell.SendKeys "{ENTER}"
+            WScript.Sleep delayS ' crucial
+            ' go back to mass input
+            Shell.SendKeys "+{TAB 5}"
+        ElseIf ((widthcol < 1) And (cyclescol > 0)) Then
+            Shell.SendKeys "{TAB 6}"
+            ' Smoothing cycles go here
+            Shell.SendKeys CStr(ws.Cells(row, cyclescol).Value)
+            ' click "Add"
+            Shell.SendKeys "+{TAB}"
+            Shell.SendKeys "{ENTER}"
+            WScript.Sleep delayS ' crucial
+            ' go back to mass input
+            Shell.SendKeys "+{TAB 5}"
+        Else
+            ' click "Add"
+            Shell.SendKeys "{TAB 5}"
+            Shell.SendKeys "{ENTER}"
+            ' go back to mass input
+            Shell.SendKeys "+{TAB 5}"
+        End If
         '''''''''''''''''''''''''''''''''''''''''''''
         prevpi = pivalue
     End If
@@ -424,17 +509,17 @@ Shell.SendKeys "{TAB}"
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ' enter all retention times
-prevpi = ws.Cells(initrow,picol).Value
+prevpi = ws.Cells(initrow, picol).Value
 count = 1
 For row = initrow to lastrow
     If (namecol > 0) Then
-        compname = ws.Cells(row,namecol).Value
+        compname = ws.Cells(row, namecol).Value
     Else
         compname = ""
     End If
-    pivalue = ws.Cells(row,picol).Value
-    rtvalue = ws.Cells(row,rtcol).Value
-    rtwin   = ws.Cells(row,rtwcol).Value
+    pivalue = ws.Cells(row, picol).Value
+    rtvalue = ws.Cells(row, rtcol).Value
+    rtwin   = ws.Cells(row, rtwcol).Value
     pipos   = pilist.IndexOf(pivalue, 0)
     If pivalue = prevpi Then
     
@@ -655,9 +740,9 @@ Next
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 MsgBox "Dont't forget to enter sample names and to " &_
-        "save the batch file before processing!", _
-        vbOKOnly+vbExclamation+vbSystemModal, _
-        "QuantAnalysis method writer"
+       "save the batch file before processing!", _
+       vbOKOnly+vbExclamation+vbSystemModal, _
+       "QuantAnalysis method writer"
 
 ' manually add sample names (important for plotting in R)
 ' save Batch file before Process
