@@ -6,7 +6,7 @@ Option Explicit
 ' work table with all the Bruker LCMS data files in the current directory
 '
 ' The *.d data files have to be in the same folder as the script
-' it is advised to use copies and not your original files
+' Has been successfully tested with QuantAnalysis 2.1 + 2.2 on Windows 7 (64 bit)
 
 ' IMPORTANT
 ' This script assumes that QuantAnalysis opens in Nested or Work Table view
@@ -27,8 +27,6 @@ delay = 50
 '##############################'
 '##############################'
 
-
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 '' open QuantAnalysis
@@ -41,14 +39,13 @@ Dim Process, strObject, strProcess, IsProcessRunning
 Const strComputer = "." 
 strProcess = "QuantAnalysis.exe"
 IsProcessRunning = False
-strObject   = "winmgmts://" & strComputer
+strObject = "winmgmts://" & strComputer
 For Each Process in GetObject( strObject ).InstancesOf( "win32_process" )
 If UCase( Process.name ) = UCase( strProcess ) Then
-        MsgBox "QuantAnalysis is already running! It might be safer to check it" _
-        +", save your work and close the application before using this script. Will abort now...", _
-        vbOKOnly+vbCritical+vbSystemModal, "QuantAnalysis method writer"
-        wb.Close False
-        xl.Quit
+        MsgBox "QuantAnalysis is already running! It might be safer to check" &_
+               " it, save your work and close the application before using " &_
+               "this script. Will abort now...", _
+               vbOKOnly+vbCritical+vbSystemModal, "QuantAnalysis sample importer"
         Wscript.Quit
     End If
 Next
@@ -58,14 +55,12 @@ Set Shell = WScript.CreateObject("WScript.Shell")
 Shell.Run("QuantAnalysis")
 WScript.Sleep 5000
 
-result = MsgBox ("Now the Work Table will be populated." _
-                + vbCrLf + vbCrLf _
-                + "Please, switch to Nested or Work Table view!", _
+result = MsgBox("Now the Work Table will be populated." &_
+                vbCrLf + vbCrLf &_
+                "Please, switch to Nested or Work Table view!", _
                 vbOKCancel+vbInformation+vbSystemModal, _
-                "QuantAnalysis method writer")
+                "QuantAnalysis sample importer")
 If result = vbCancel Then
-    wb.Close False
-    xl.Quit
     Wscript.Quit
 End If
 
@@ -162,10 +157,10 @@ Next
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-MsgBox "Dont't forget to enter sample names and to " + _
-    "save the batch file before processing!", _
-    vbOKOnly+vbExclamation+vbSystemModal, _
-    "QuantAnalysis method writer"
+MsgBox "Dont't forget to enter sample names and to " &_
+       "save the batch file before processing!", _
+       vbOKOnly+vbExclamation+vbSystemModal, _
+       "QuantAnalysis sample importer"
 
 ' manually add sample names (important for plotting in R)
 ' save Batch file before Process
