@@ -15,8 +15,6 @@ Option Explicit
 ' the data shall be stored as values, no Excel formulas
 ' the method file will be saved in the same folder
 ' the MS data files have to be in the same folder as well
-' it is advised to use copies and not you original files
-' it is advised to close all other programs before using this script
 
 ' EIC mass window width parameter can be specified in the script
 ' EIC smoothing parameters can be set globally in the script
@@ -25,6 +23,8 @@ Option Explicit
 ' the same smoothing parameters as well, because only one EIC will be created
 
 ' IMPORTANT
+' It is advised to use copies and not you original files
+' It is advised to close all other programs before using this script
 ' This script assumes that QuantAnalysis opens in Nested or Work Table view
 ' This script assumes that you use the standard table layout of QuantAnalysis
 ' Your Windows environment shall use dots as decimal separator (not commas)
@@ -55,8 +55,8 @@ Dim polarity
 '##############################'
 '######### SET VALUES #########'
 
-' where to find you table? There shall be only one Excel file in the folder, where you run this script
-sheetname   = "Sheet4"
+' where to find your table? There shall be only one Excel file in the folder, where you run this script
+sheetname   = "Sheet1"
 sorted      = False ' is your sheet already sorted for QuantAnalysis? set to False if you want this script to sort your data for QuantAnalyis
 keepchanges = False ' do you want to save a sorted copy of your sheet?
 
@@ -75,7 +75,7 @@ rtwcol  = 5
 polarity = "negative"
 
 ' EIC mass window, will result in mz +/- mzwidth
-mzwidth = 0.3 ' on our instrument 0.2 - 0.3 is a good choice
+mzwidth = 0.3 ' on our ion trap instrument 0.2 - 0.3 is a good choice
 
 ' Smoothing Parameters
 ' width is specified in seconds: 2.0 -  5.0
@@ -234,7 +234,7 @@ Set SheetOne = wb.Sheets(sheetname)
 Basename = SheetOne.Name
 'MsgBox Basename & ": " & wb.Sheets.Count
 
-' copy the original sheet, for safety, copy will be deleted at the end
+' copy the original sheet, for safety. copy will be deleted at the end
 ' http://stackoverflow.com/a/22771845/3852788
 SheetOne.Copy , wb.Sheets(wb.Sheets.Count)
 wb.ActiveSheet.Name = Basename & " copy"
@@ -257,6 +257,7 @@ End With
 'MsgBox "LastRow: " & CStr(LastRow) & "       LastCol: " & CStr(LastCol)
 
 ' change PI from Number to Text format, otherwise the sorting does not work properly
+' (QuantAnalysis sorts numerical values as if they were text strings)
 With SheetOne
     .Range(.Cells(2, picol), .Cells(LastRow, picol)).Select
     Call NumToText
@@ -656,7 +657,7 @@ End If
 '' set some fields to "1"
 
 ' populate work table
-' the QA WorkTable is very slow responding, thus we need to wait alot
+' the QA WorkTable is responding very slowly, thus we need to wait alot
 
 ' go to work table
 Shell.SendKeys "+{TAB 5}"
